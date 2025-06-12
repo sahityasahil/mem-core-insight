@@ -1,24 +1,541 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mem-core-insight</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory & CPU Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <meta property="og:title" content="mem-core-insight" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #eff6ff 0%, #ffffff 50%, #f0fdf4 100%);
+            min-height: 100vh;
+            line-height: 1.5;
+            color: #111827;
+        }
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            color: #2563eb;
+        }
+
+        .header p {
+            font-size: 1.125rem;
+            color: #6b7280;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            padding: 1.5rem 1.5rem 0 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            padding-top: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .input {
+            width: 100%;
+            height: 2.5rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 1.125rem;
+            background: white;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .error {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .error-text {
+            color: #dc2626;
+            font-size: 0.875rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 1rem;
+        }
+
+        .button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            border: none;
+            flex: 1;
+        }
+
+        .button-primary {
+            background-color: #111827;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background-color: #1f2937;
+        }
+
+        .button-outline {
+            background-color: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .button-outline:hover {
+            background-color: #f9fafb;
+            color: #111827;
+        }
+
+        .results-placeholder {
+            text-align: center;
+            padding: 2rem 0;
+            color: #6b7280;
+        }
+
+        .placeholder-icon {
+            width: 3rem;
+            height: 3rem;
+            color: #d1d5db;
+            margin: 0 auto 0.75rem;
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .result-card {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid;
+        }
+
+        .result-card.blue {
+            background-color: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .result-card.green {
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-card.blue .result-title {
+            color: #1e3a8a;
+        }
+
+        .result-card.green .result-title {
+            color: #166534;
+        }
+
+        .result-item {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-card.blue .result-item {
+            color: #1d4ed8;
+        }
+
+        .result-card.green .result-item {
+            color: #16a34a;
+        }
+
+        .result-value {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .summary {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-item {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+
+        .formula-section {
+            margin-top: 2rem;
+        }
+
+        .formula-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .formula-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .formula-group h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .formula {
+            font-family: 'Courier New', monospace;
+            background-color: #f3f4f6;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .small-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .green-icon {
+            color: #16a34a;
+        }
+
+        .blue-icon {
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                Memory & CPU Calculator
+            </h1>
+            <p>Calculate DDRAM usage and CPU load metrics</p>
+        </div>
+
+        <div class="grid">
+            <!-- Input Section -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg class="small-icon green-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                        </svg>
+                        Memory Inputs
+                    </div>
+                    <div class="card-description">
+                        Enter your memory values in MB to calculate usage metrics
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label class="label" for="totalMemory">Total Memory (MB)</label>
+                        <input 
+                            class="input" 
+                            id="totalMemory" 
+                            type="number" 
+                            placeholder="e.g., 8192"
+                        />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="label" for="availableMemory">Available Memory (MB)</label>
+                        <input 
+                            class="input" 
+                            id="availableMemory" 
+                            type="number" 
+                            placeholder="e.g., 4096"
+                        />
+                    </div>
+
+                    <div id="errorContainer" class="error" style="display: none;">
+                        <p id="errorText" class="error-text"></p>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="button button-primary" onclick="calculateValues()">
+                            Calculate
+                        </button>
+                        <button class="button button-outline" onclick="clearValues()">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg class="small-icon blue-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect x="4" y="4" width="16" height="12" rx="2"></rect>
+                            <rect x="4" y="18" width="16" height="2" rx="1"></rect>
+                            <line x1="8" y1="22" x2="16" y2="22"></line>
+                            <line x1="12" y1="20" x2="12" y2="22"></line>
+                        </svg>
+                        Calculation Results
+                    </div>
+                    <div class="card-description">
+                        GIP core metrics based on your input values
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div id="resultsContainer">
+                        <div class="results-placeholder">
+                            <svg class="placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                <line x1="8" y1="21" x2="16" y2="21"></line>
+                                <line x1="12" y1="17" x2="12" y2="21"></line>
+                            </svg>
+                            <p>Enter memory values and click Calculate to see results</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formula Reference -->
+        <div class="card formula-section">
+            <div class="card-header">
+                <div class="card-title">Formula Reference</div>
+            </div>
+            <div class="card-content">
+                <div class="formula-grid">
+                    <div class="formula-group">
+                        <h4>DDRAM Usage Calculations:</h4>
+                        <div class="formula">
+                            Usage % = ((Total - Available) / Total) × 100
+                        </div>
+                        <div class="formula">
+                            Usage MB = (Usage % / 100) × Total Memory
+                        </div>
+                    </div>
+                    <div class="formula-group">
+                        <h4>CPU Load Calculations:</h4>
+                        <div class="formula">
+                            Load % = ((1024 - Available) / 1024) × 100
+                        </div>
+                        <div class="formula">
+                            Idle % = 100 - Load %
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateValues() {
+            const totalMemoryInput = document.getElementById('totalMemory');
+            const availableMemoryInput = document.getElementById('availableMemory');
+            const errorContainer = document.getElementById('errorContainer');
+            const errorText = document.getElementById('errorText');
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            const totalMemory = parseFloat(totalMemoryInput.value);
+            const availableMemory = parseFloat(availableMemoryInput.value);
+
+            // Clear previous errors
+            errorContainer.style.display = 'none';
+
+            // Input validation
+            if (!totalMemoryInput.value || !availableMemoryInput.value || 
+                isNaN(totalMemory) || isNaN(availableMemory)) {
+                showError('Please enter valid numeric values for both fields');
+                clearResults();
+                return;
+            }
+
+            if (totalMemory <= 0 || availableMemory < 0) {
+                showError('Total memory must be positive and available memory cannot be negative');
+                clearResults();
+                return;
+            }
+
+            if (availableMemory > totalMemory) {
+                showError('Available memory cannot be greater than total memory');
+                clearResults();
+                return;
+            }
+
+            // Calculations based on formulas
+            const ddramUsagePercent = ((totalMemory - availableMemory) / totalMemory) * 100;
+            const ddramUsageMB = (ddramUsagePercent / 100) * totalMemory;
+            const cpuLoadPercent = ((1024 - availableMemory) / 1024) * 100;
+            const cpuIdlePercent = 100 - cpuLoadPercent;
+
+            // Display results
+            showResults({
+                ddramUsagePercent: parseFloat(ddramUsagePercent.toFixed(3)),
+                ddramUsageMB: parseFloat(ddramUsageMB.toFixed(3)),
+                cpuLoadPercent: parseFloat(cpuLoadPercent.toFixed(3)),
+                cpuIdlePercent: parseFloat(cpuIdlePercent.toFixed(3))
+            }, totalMemory, availableMemory);
+        }
+
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+
+        function clearResults() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = `
+                <div class="results-placeholder">
+                    <svg class="placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                    <p>Enter memory values and click Calculate to see results</p>
+                </div>
+            `;
+        }
+
+        function showResults(results, totalMemory, availableMemory) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = `
+                <div class="results-grid">
+                    <div class="result-card blue">
+                        <h3 class="result-title">DDRAM Usage</h3>
+                        <div class="result-item">
+                            Percentage: <span class="result-value">${results.ddramUsagePercent}%</span>
+                        </div>
+                        <div class="result-item">
+                            Memory Used: <span class="result-value">${results.ddramUsageMB} MB</span>
+                        </div>
+                    </div>
+
+                    <div class="result-card green">
+                        <h3 class="result-title">CPU Load</h3>
+                        <div class="result-item">
+                            Load: <span class="result-value">${results.cpuLoadPercent}%</span>
+                        </div>
+                        <div class="result-item">
+                            Idle: <span class="result-value">${results.cpuIdlePercent}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <h4 class="summary-title">Summary</h4>
+                    <div class="summary-item">Total Memory: ${totalMemory} MB</div>
+                    <div class="summary-item">Available Memory: ${availableMemory} MB</div>
+                    <div class="summary-item">Used Memory: ${totalMemory - availableMemory} MB</div>
+                </div>
+            `;
+        }
+
+        function clearValues() {
+            document.getElementById('totalMemory').value = '';
+            document.getElementById('availableMemory').value = '';
+            document.getElementById('errorContainer').style.display = 'none';
+            clearResults();
+        }
+    </script>
+</body>
 </html>
