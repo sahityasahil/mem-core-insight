@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Calculator, Memory, Cpu } from 'lucide-react';
+import { Calculator, HardDrive, Cpu } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -80,7 +80,7 @@ const MemoryCalculator = () => {
         <Card className="h-fit">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Memory className="h-5 w-5 text-green-600" />
+              <HardDrive className="h-5 w-5 text-green-600" />
               Memory Inputs
             </CardTitle>
             <CardDescription>
